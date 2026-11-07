@@ -27,17 +27,20 @@
                 <span>Create a <b>process</b>: </span>
                 <input type="text" id="add-process-input">
                 <button type="submit">Create process</button>
-            </form>
+            </form><br>
 
-            <hr>
-
-            <div id="resource-types">
-                
-            </div>
-
-            <hr>
+            <p style="font-size: small;">Note: You cannot use the characters ', ", or \ in process or resource names.</p>
             
-            <div id="processes">
+            <br>
+            <button onclick="updateDisplay()">
+                Refresh Display
+            </button>
+            <hr>
+            <div id="resource-types">
+
+            </div>
+            <hr>
+            <div id="processes-container">
 
             </div>
         </div>

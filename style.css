@@ -3,6 +3,10 @@ body {
     font-family: 'Courier New', Courier, monospace;
 }
 
+h5 {
+    margin: 10px 0px;
+}
+
 #screen {
     display: flex;
     flex-direction: row;
@@ -10,12 +14,22 @@ body {
 
 #control-panel {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     flex: 1;
     padding-left: 8px;
     padding-top: 8px;
     box-sizing: border-box;
-    border-right: 1px solid black;
+}
+
+#control-panel::after { /* why is making fake borders so painful */
+    content: "";
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: black;
+    transform: translateX(-50%);
 }
 
 #info-panel {
@@ -30,8 +44,31 @@ body {
 }
 
 .process-wrapper {
-    border: 8px solid rgb(182, 149, 106);
+    border: 4px solid rgb(182, 149, 106);
     border-radius: 8px;
-    padding: 0px 8px;
+    padding: 8px;
+    margin: 2px;
     width: fit-content;
+}
+
+.grid-wrapper {
+    border: 3px solid rgb(106, 139, 182);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 2px;
+    width: fit-content;
+
+    display: grid;
+    grid-template-columns: fit-content(20ch) 10ch auto;
+    align-items: center;
+    gap: 8px
+}
+
+.special-wrapper {
+    border: 2px solid rgb(133, 72, 54);
+    border-radius: 8px;
+    padding: 8px;
+    width: max-content;
+
+    grid-column: 1 / -1;
 }
