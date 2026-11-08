@@ -5,20 +5,33 @@ let balance = {
     process: {
 
     },
-
-    process_names: new Set()
+    target: null
+    //process_names: new Set()
 }
+
+const PRESETS = [
+    // Gears and iron: simple chain
+    '{"resources":{"iron":0,"ingot":1,"gear":1},"process":{"Process0":{"inputs":{"iron":3},"outputs":{"ingot":2},"power":5,"time":1,"allow_overclocking":true,"perfect_overclock":false},"Process1":{"inputs":{"ingot":5},"outputs":{"gear":1},"power":4,"time":2,"allow_overclocking":true,"perfect_overclock":false}},"process_names":{}}',
+    
+    // Vinyl chloride: looping chains
+    '{"resources":{"ethylene":0,"salt":0,"water":0,"oxygen":0,"chlorine":1,"EDC":1,"hydrochloric_acid":1,"hydrogen":1,"sodium_hydroxide":1,"vinyl_chloride":1},"process":{"Electrolysis":{"inputs":{"salt":2,"water":2},"outputs":{"chlorine":1,"hydrogen":1,"sodium_hydroxide":2},"power":10,"time":1,"allow_overclocking":true,"perfect_overclock":false},"Chlorination":{"inputs":{"ethylene":1,"chlorine":1},"outputs":{"EDC":1},"power":1,"time":1,"allow_overclocking":true,"perfect_overclock":false},"Oxychlorination":{"inputs":{"ethylene":2,"hydrochloric_acid":4,"oxygen":1},"outputs":{"EDC":2,"water":2},"power":3,"time":1,"allow_overclocking":true,"perfect_overclock":false},"Cracking":{"inputs":{"EDC":1},"outputs":{"vinyl_chloride":1,"hydrochloric_acid":1},"power":4,"time":1,"allow_overclocking":true,"perfect_overclock":false}},"process_names":{}}',
+
+    // Gears, Presses and Hammers: differing results by solve mode
+    '{"resources":{"iron":0,"plate":1,"gear":1},"process":{"Press":{"inputs":{"iron":1},"outputs":{"plate":1},"power":10,"time":1,"allow_overclocking":true,"perfect_overclock":false},"Hammer":{"inputs":{"iron":1},"outputs":{"plate":1},"power":1,"time":4,"allow_overclocking":true,"perfect_overclock":false},"Assembler":{"inputs":{"plate":2},"outputs":{"gear":1},"power":2,"time":1,"allow_overclocking":true,"perfect_overclock":false}}}',
+]
 
 document.getElementById("add-resource").addEventListener('submit', (e) => {
     e.preventDefault()
 
     addResource(document.getElementById('add-resource-input').value)
+    document.getElementById('add-resource-input').value = ""
 })
 
 document.getElementById("remove-resource").addEventListener('submit', (e) => {
     e.preventDefault()
 
     removeResource(document.getElementById('remove-resource-input').value)
+    document.getElementById('remove-resource-input').value = ""
 })
 
 document.getElementById("add-process").addEventListener('submit', (e) => {
@@ -28,9 +41,16 @@ document.getElementById("add-process").addEventListener('submit', (e) => {
 })
 
 function getGenericProcessName() {
-    let least_unused = 0
+    /*let least_unused = 0
     while (balance.process_names.has(least_unused)) least_unused += 1
-    return least_unused
+    return least_unused*/
+    // It turns out that sets don't play nice with stringify.
+    let alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+    let name = Array(10).fill(0)
+    name.forEach((v, i) => {
+        name[i] = alphabet[Math.floor(Math.random() * 52)]
+    })
+    return name.join("")
 }
 
 function addResource(id) {
@@ -71,10 +91,25 @@ function removeResource(id) {
     return 1
 }
 
+function toggleResource(id) {
+    if (id === "" || id === null) {
+        return 0
+    }
+
+    id = id.replaceAll("'", "_").replaceAll("\\", "_").replaceAll("\"", "_").replaceAll(" ", "_")
+    
+    if (balance.resources[id] == undefined) {
+        alert(`Resource ${id} does not exist!`)
+        return 0
+    }
+
+    balance.resources[id] = 1 - balance.resources[id]
+}
+
 function createProcess(id) {
     let smallest_unused = getGenericProcessName()
-    if (id === "" || id === null) {
-        id = `Process${smallest_unused}`
+    if (id === "" || id === null || id === undefined) {
+        id = `${smallest_unused}`
     }
 
     id = id.replaceAll("'", "_").replaceAll("\\", "_").replaceAll("\"", "_").replaceAll(" ", "_")
@@ -92,7 +127,7 @@ function createProcess(id) {
         allow_overclocking: true,
         perfect_overclock: false
     }
-    balance.process_names.add(smallest_unused)
+    //balance.process_names.add(smallest_unused)
     updateDisplay()
     return 1
 }
@@ -157,15 +192,15 @@ function removeProcessOut(id, obj) {
 function updateDisplay() {
     let resources_string = `
         <h3>Current Resources</h3>
-        <ul>
+        <div class="res-grid-wrapper">
     `
     
     let resources = Object.keys(balance.resources)
     for (let res of resources.sort()) {
-        resources_string += `<li>${res.replaceAll("_", " ")} <button onclick="removeResource('${res}')">Remove this resource</button></li>`
+        resources_string += `${res.replaceAll("_", " ")} <input id="${res}-is-basic" type="checkbox"> <button onclick="removeResource('${res}')">Remove this resource</button> <button onclick="balance.target = '${res}'; updateDisplay();">Set this resource as the target</button>`
     }
 
-    resources_string += "</ul>"
+    resources_string += "</div>"
     document.getElementById("resource-types").innerHTML = resources_string
 
     let processes_string = `
@@ -201,7 +236,7 @@ function updateDisplay() {
             outputs_string += `
                 ${i.replaceAll("_", " ")}
                 <input type="number" id="${proc}-${i}-amount-output" data-proc="${proc}" data-i="${i}" class="output-item-form" value="${balance.process[proc].outputs[i]}" style="width: 10ch;">
-                <button onclick="removeProcessOut("${proc}", "${i}")">Remove this output</button>
+                <button onclick="removeProcessOut('${proc}', '${i}')">Remove this output</button>
             `
         }
 
@@ -232,6 +267,14 @@ function updateDisplay() {
 
     document.getElementById("processes-container").innerHTML = processes_string
 
+    for (let res of resources.sort()) {
+        document.getElementById(`${res}-is-basic`).checked = !!balance.resources[res]
+        document.getElementById(`${res}-is-basic`).addEventListener("change", () => {
+            toggleResource(res)
+            document.getElementById(`${res}-is-basic`).checked = !!balance.resources[res]
+        })
+    }
+
     for (let proc of Object.keys(balance.process)) {
         document.getElementById(`${proc}-input-add`).addEventListener('submit', (e) => {
             e.preventDefault()
@@ -259,7 +302,7 @@ function updateDisplay() {
 
         document.querySelectorAll(".name-form").forEach((x) => {
             x.addEventListener('change', (e) => {
-                balance.process[x.value] = balance.process[x.dataset.proc]
+                balance.process[x.value] = JSON.parse(JSON.stringify(balance.process[x.dataset.proc]))
                 removeProcess(x.dataset.proc, true)
                 updateDisplay()
             })
@@ -277,4 +320,84 @@ function updateDisplay() {
             })
         })
     }
+
+    document.getElementById("solve-update-item").innerHTML = (balance.target ?? "").replaceAll("_", " ")
+    save(balance)
 }
+
+let global_results = null
+function updateResults() {
+    if (global_results == null) return
+
+    let resources = Object.keys(balance.resources)
+    let results_grid_element = `<div class="general-grid" style="--cols: ${resources.length + 2}">`
+    
+    // Draw top row
+    results_grid_element += `<span></span>`
+    for (let res of resources) {
+        if (res == balance.target) {results_grid_element += `<span class="target">${res.replaceAll("_", " ")}</span>`}
+        else {
+            if (balance.resources[res] == 0) {results_grid_element += `<span class="input-mat">${res.replaceAll("_", " ")}</span>`}
+            else {results_grid_element += `<span>${res.replaceAll("_", " ")}</span>`}
+        }
+    }
+    results_grid_element += `<span class="power">${global_results.type == 1 ? "Machines" : "Power"}</span>`
+
+    let running_index = 0
+    let resource_net = {}
+    for (let proc of Object.keys(balance.process)) {
+        results_grid_element += `<span>${proc} <br>x ${global_results.machines[running_index]}</span>`
+        for (let res of resources) {
+            let val = ((balance.process[proc].outputs?.[res] ?? 0) - (balance.process[proc].inputs[res] ?? 0)) * global_results.machines[running_index] / balance.process[proc].time
+            if (Number.isNaN(val)) {
+                val = 0
+            }
+            if (res == balance.target) {results_grid_element += `<span class="target values ${val == 0 ? "" : (val > 0 ? "positive" : "negative")}">${val}/s</span>`}
+            else {
+                if (balance.resources[res] == 0) {results_grid_element += `<span class="input-mat values ${val == 0 ? "" : (val > 0 ? "positive" : "negative")}">${val}/s</span>`}
+                else {results_grid_element += `<span class="values ${val == 0 ? "" : (val > 0 ? "positive" : "negative")}">${val}/s</span>`}
+            }
+
+            resource_net[res] = (resource_net?.[res] ?? 0) + val
+        }
+        results_grid_element += `<span class="power values">${(global_results.type == 1 ? 1 : balance.process[proc].power) * global_results.machines[running_index] / (global_results.type != 2 ? 1 : balance.process[proc].time)}${global_results.type == 2 ? "/s" : ""}</span>`
+        running_index += 1
+    }
+
+    // Draw bottom row
+    results_grid_element += `<span class="bottom-row values">Total Values</span>`
+    for (let res of resources) {
+        if (res == balance.target) {results_grid_element += `<span class="bottom-row target values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
+        else {
+            if (balance.resources[res] == 0) {results_grid_element += `<span class="bottom-row input-mat values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
+            else {results_grid_element += `<span class="bottom-row values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
+        }
+    }
+    results_grid_element += `<span class="bottom-row values power">${global_results.cost}${global_results.type == 2 ? "/s" : ""}</span>`
+                    
+    results_grid_element += `</div>`
+    document.getElementById("grid").innerHTML = results_grid_element
+}
+
+function load_preset(i) {
+    if (i > PRESETS.length) {
+        return
+    }
+
+    balance = JSON.parse(PRESETS[i])
+    updateDisplay()
+}
+
+function save(p = null) {
+    localStorage.setItem("gtpc-recipe", JSON.stringify(p))
+}
+
+function load() {
+    let loaded_save = localStorage.getItem("gtpc-recipe")
+    if (loaded_save === null || JSON.parse(loaded_save) === null) return
+    balance = JSON.parse(loaded_save)
+
+    updateDisplay()
+}
+
+load()

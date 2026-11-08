@@ -14,26 +14,17 @@ h5 {
 
 #control-panel {
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     flex: 1;
     padding-left: 8px;
     padding-top: 8px;
     box-sizing: border-box;
-}
-
-#control-panel::after { /* why is making fake borders so painful */
-    content: "";
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 2px;
-    background: black;
-    transform: translateX(-50%);
+    border-right: 1px solid black;
 }
 
 #info-panel {
-    width: 100%;
+    width: auto;
+    min-width: 0;
     height: 100vh;
     padding-left: 8px;
     padding-top: 8px;
@@ -64,6 +55,44 @@ h5 {
     gap: 8px
 }
 
+.res-grid-wrapper {
+    border: 3px solid rgb(106, 139, 182);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 2px;
+    width: fit-content;
+
+    display: grid;
+    grid-template-columns: fit-content(20ch) 5ch 1fr auto;
+    align-items: center;
+    gap: 8px
+}
+
+.general-grid {
+    border: 3px solid black;
+    width: max-content;
+
+    display: grid;
+    grid-template-columns: repeat(var(--cols), fit-content(400px)) !important;
+}
+
+.general-grid > span {
+    border: 1px solid black;
+    padding: 8px;
+    min-width: 100px;
+    font-size: 10px;
+}
+
+.general-grid > .values {
+    font-size: 20px;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.general-grid > .bottom-row {
+    border-top: 2px solid black;
+}
+
 .special-wrapper {
     border: 2px solid rgb(133, 72, 54);
     border-radius: 8px;
@@ -71,4 +100,30 @@ h5 {
     width: max-content;
 
     grid-column: 1 / -1;
+}
+
+.target {
+    background-color: #d9ebff;
+}
+
+.input-mat {
+    background-color: #e6ecd6;
+}
+
+.power {
+    background-color: #fff6d9;
+}
+
+.positive {
+    color: rgb(105, 196, 105);
+    font-weight: bolder;
+}
+
+.negative {
+    color: rgb(196, 105, 105);
+    font-weight: bolder;
+}
+
+.normal {
+    width: fit-content;
 }

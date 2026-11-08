@@ -6,6 +6,7 @@
     <title>GregTech Processing Chain Balancer</title>
 
     <link rel="stylesheet" href="style.css">
+    <script src="solver.js"></script>
     <script src="main.js" defer></script>
 </head>
 <body>
@@ -15,13 +16,13 @@
                 <span>Add a <b>resource</b>: </span>
                 <input type="text" id="add-resource-input">
                 <button type="submit">Add</button>
-            </form><br>
+            </form>
 
             <form id="remove-resource">
                 <span>Remove a <b>resource</b>: </span>
                 <input type="text" id="remove-resource-input">
                 <button type="submit">Remove</button>
-            </form><br>
+            </form>
 
             <form id="add-process">
                 <span>Create a <b>process</b>: </span>
@@ -31,10 +32,17 @@
 
             <p style="font-size: small;">Note: You cannot use the characters ', ", or \ in process or resource names.</p>
             
-            <br>
             <button onclick="updateDisplay()">
                 Refresh Display
             </button>
+            <br><br>
+
+            Presets:<br>
+            <button onclick="balance = {resources: {}, process: {}, target: null}; updateDisplay()">Reset recipe</button><br>
+            <button onclick="load_preset(0)">Load gears preset</button><br>
+            <button onclick="load_preset(1)">Load vinyl chloride preset</button><br>
+            <button onclick="load_preset(2)">Load gears and hammers preset</button><br>
+
             <hr>
             <div id="resource-types">
 
@@ -47,6 +55,18 @@
         <div id="info-panel">
             <h2>GregTech Processing Chain Balancer</h2>
             <p>This project is for balancing the various production chains of things in GregTech modpacks. Input all the separate productions on the left, and the results will be shown in the bottom.</p>
+            <br><br><br>
+            <span id="solve-update">Solving for <input id="solve-amount" type="number" style="width: 10ch;">/s of <span id="solve-update-item"></span></span>
+            <br>
+            <button class="normal" onclick="global_results = solve(0, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum power</button>
+            <button class="normal" onclick="global_results = solve(1, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum machine count</button>
+            <button class="normal" onclick="global_results = solve(2, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum power / sec</button>
+            <br><br>
+            <div id="grid">
+                <div class="general-grid" style="--cols: 5">
+                    
+                </div>
+            </div>
         </div>
     </div>
 </body>
