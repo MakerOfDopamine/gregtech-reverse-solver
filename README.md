@@ -12,7 +12,7 @@ the checkboxes next to the resources toggle whether they are considered "interme
 
 the preset buttons each load one pre-coded demo systems. the things which each preset demonstrates can be found in `main.js`.
 
-if pressing solve looked like it did nothing, open the console with F12 or ctrl-shift-i or ctrl-shift-j or your preferred other method of opening. the error will state whether the solution is "infeasible" (no combination of machines can achieve your goal: you may have asked for something that doesn't get produced by any machine, or its prerequisites are unacquirable) or "unbounded" (this should be unachievable, but for completeness, this happening means the solver has found a way somehow to improve your target infinitely).
+if pressing solve looked like it did nothing, open the console with F12 or ctrl-shift-i or ctrl-shift-j or your preferred other method of opening. the error will state whether the solution is "infeasible" (no combination of machines can achieve your goal: you may have asked for something that doesn't get produced by any machine, or its prerequisites are unacquirable) or "unbounded" (this should be unachievable, but for completeness, this happening means the solver has found a way somehow to improve your objective infinitely).
 
 ## why this took me ten hours
 
