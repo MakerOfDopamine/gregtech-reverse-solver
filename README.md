@@ -8,6 +8,12 @@ in the mod, frequently there will be large lines of processing chain with interl
 
 the page `index.html` is the main page of the solver. this page can be opened for the solver. it is also available at https://makerofdopamine.github.io/gregtech-reverse-solver.
 
+the checkboxes next to the resources toggle whether they are considered "intermediate" resources (and thus cannot have a negative total flow). if it is unchecked, the resource can be imported. note that by default all added resources are checked, and if all resources are checked the solver will fail as you are asking it to create something from nothing. (however, in cases where a process is added to produce a resource with no inputs, it may still be solvable.)
+
+the preset buttons each load one pre-coded demo systems. the things which each preset demonstrates can be found in `main.js`.
+
+if pressing solve looked like it did nothing, open the console with F12 or ctrl-shift-i or ctrl-shift-j or your preferred other method of opening. the error will state whether the solution is "infeasible" (no combination of machines can achieve your goal: you may have asked for something that doesn't get produced by any machine, or its prerequisites are unacquirable) or "unbounded" (this should be unachievable, but for completeness, this happening means the solver has found a way somehow to improve your target infinitely).
+
 ## why this took me ten hours
 
 you may be wondering: hey, this is only a basic webpage without even that much css! how did this take you ten whole hours to make?
