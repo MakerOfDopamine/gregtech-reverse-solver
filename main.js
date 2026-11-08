@@ -189,6 +189,10 @@ function removeProcessOut(id, obj) {
     updateDisplay()
 }
 
+function fixfp(x) {
+    return Math.round(x * 1000) / 1000
+}
+
 function updateDisplay() {
     let resources_string = `
         <h3>Current Resources</h3>
@@ -346,9 +350,9 @@ function updateResults() {
     let running_index = 0
     let resource_net = {}
     for (let proc of Object.keys(balance.process)) {
-        results_grid_element += `<span>${proc} <br>x ${global_results.machines[running_index]}</span>`
+        results_grid_element += `<span>${proc} <br>x ${fixfp(global_results.machines[running_index])}</span>`
         for (let res of resources) {
-            let val = ((balance.process[proc].outputs?.[res] ?? 0) - (balance.process[proc].inputs[res] ?? 0)) * global_results.machines[running_index] / balance.process[proc].time
+            let val = fixfp(((balance.process[proc].outputs?.[res] ?? 0) - (balance.process[proc].inputs[res] ?? 0)) * global_results.machines[running_index] / balance.process[proc].time)
             if (Number.isNaN(val)) {
                 val = 0
             }
@@ -360,20 +364,20 @@ function updateResults() {
 
             resource_net[res] = (resource_net?.[res] ?? 0) + val
         }
-        results_grid_element += `<span class="power values">${(global_results.type == 1 ? 1 : balance.process[proc].power) * global_results.machines[running_index] / (global_results.type != 2 ? 1 : balance.process[proc].time)}${global_results.type == 2 ? "/s" : ""}</span>`
+        results_grid_element += `<span class="power values">${fixfp((global_results.type == 1 ? 1 : balance.process[proc].power) * global_results.machines[running_index] / (global_results.type != 2 ? 1 : balance.process[proc].time))}${global_results.type == 2 ? "/s" : ""}</span>`
         running_index += 1
     }
 
     // Draw bottom row
     results_grid_element += `<span class="bottom-row values">Total Values</span>`
     for (let res of resources) {
-        if (res == balance.target) {results_grid_element += `<span class="bottom-row target values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
+        if (res == balance.target) {results_grid_element += `<span class="bottom-row target values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${fixfp(resource_net[res])}/s</span>`}
         else {
-            if (balance.resources[res] == 0) {results_grid_element += `<span class="bottom-row input-mat values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
-            else {results_grid_element += `<span class="bottom-row values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${resource_net[res]}/s</span>`}
+            if (balance.resources[res] == 0) {results_grid_element += `<span class="bottom-row input-mat values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${fixfp(resource_net[res])}/s</span>`}
+            else {results_grid_element += `<span class="bottom-row values ${resource_net[res] == 0 ? "" : (resource_net[res] > 0 ? "positive" : "negative")}">${fixfp(resource_net[res])}/s</span>`}
         }
     }
-    results_grid_element += `<span class="bottom-row values power">${global_results.cost}${global_results.type == 2 ? "/s" : ""}</span>`
+    results_grid_element += `<span class="bottom-row values power">${fixfp(global_results.cost)}${global_results.type == 2 ? "/s" : ""}</span>`
                     
     results_grid_element += `</div>`
     document.getElementById("grid").innerHTML = results_grid_element

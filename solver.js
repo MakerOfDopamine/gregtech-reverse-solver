@@ -358,9 +358,6 @@ function solve(solve_type, balance, target, amount) {
         }
 
         switch (solve_type) {
-            case 0:
-                cost_arr.push(balance.process[proc].power)
-                break
             case 1:
                 cost_arr.push(1)
                 break

@@ -31,6 +31,7 @@
             </form><br>
 
             <p style="font-size: small;">Note: You cannot use the characters ', ", or \ in process or resource names.</p>
+            <p style="font-size: small;">Note 2: Despite power being called power, it is actually !energy per recipe!</p>
             
             <button onclick="updateDisplay()">
                 Refresh Display
@@ -58,7 +59,6 @@
             <br><br><br>
             <span id="solve-update">Solving for <input id="solve-amount" type="number" style="width: 10ch;">/s of <span id="solve-update-item"></span></span>
             <br>
-            <button class="normal" onclick="global_results = solve(0, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum power</button>
             <button class="normal" onclick="global_results = solve(1, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum machine count</button>
             <button class="normal" onclick="global_results = solve(2, balance, balance.target, Number(document.getElementById('solve-amount').value)); updateResults()"> Solve for minimum power / sec</button>
             <br><br>
